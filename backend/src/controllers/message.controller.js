@@ -1,5 +1,7 @@
 import { User } from "../models/auth.model.js";
 import { Message } from "../models/message.model.js";
+import cloudinary from '../config/cloudinaryConfig.js'
+import { getReceiverSocketId, io } from "../config/socket.js";
 
 export async function getUserForSidebar(req, res) {
   try {
@@ -19,15 +21,15 @@ export async function getUserForSidebar(req, res) {
 export const getMessages = async (req, res) => {
   try {
     const { id: userInChat } = req.params;
-    const myId = req.user._id;
+    const myId = req.currUser._id;
 
     const messages = await Message.find({
-        $or: [
-            // get messages where I am the sender and the user in chat is the receiver
-            // or where the user in chat is the sender and I am the receiver
-            {senderId: myId, receiverId: userInChat},
-            {senderId: userInChat, receiverId: myId}
-        ]
+      $or: [
+        // get messages where I am the sender and the user in chat is the receiver
+        // or where the user in chat is the sender and I am the receiver
+        { senderId: myId, receiverId: userInChat },
+        { senderId: userInChat, receiverId: myId },
+      ],
     });
     return res.status(200).json({ messages });
   } catch (error) {
@@ -41,7 +43,8 @@ export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
-    const senderId = req.user._id;
+    const senderId = req.currUser._id;
+    // console.log("sender I'd is: ", req.user._id);
 
     let imageUrl;
     if (image) {
@@ -54,6 +57,11 @@ export const sendMessage = async (req, res) => {
       text,
       image: imageUrl,
     });
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", message);
+    }
     return res.status(200).json({ message });
   } catch (error) {
     return res

@@ -6,6 +6,6 @@ const MessageRouter = express.Router();
 
 MessageRouter.get("/users", checkUserLoggedInOrNot, getUserForSidebar);
 MessageRouter.get("/:id", checkUserLoggedInOrNot, getMessages);
-MessageRouter.get("/send-message/:id", checkUserLoggedInOrNot, sendMessage);
+MessageRouter.post("/send-message/:id", checkUserLoggedInOrNot, sendMessage);
 
 export { MessageRouter };

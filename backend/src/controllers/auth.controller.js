@@ -54,7 +54,10 @@ async function login(req, res) {
       const token = await generateToken(user._id, res);
     }
 
-    return res.status(200).json({ message: "User login successfully" });
+    return res.status(200).json({
+      message: "User login successfully",
+      user,
+    });
   } catch (error) {
     return res
       .status(400)
@@ -86,9 +89,11 @@ async function updateProfile(req, res) {
       userId,
       { profilePic: uploadImage.secure_url },
       { new: true }
-    );
+    ).select("-password");
 
-    return res.status(200).json({ message: "User Updated successfully" });
+    return res
+      .status(200)
+      .json({ message: "User Updated successfully", user: updatedUser });
   } catch (error) {
     console.log("Error while updating user", error);
     return res.status(200).json({ message: "Error while updating user" });
@@ -99,7 +104,7 @@ async function authCheck(req, res) {
   try {
     return res
       .status(200)
-      .json({ message: `Current user is: ${req.currUser}` });
+      .json({ message: "You are logged in", user: req.currUser });
   } catch (error) {
     return res
       .status(400)

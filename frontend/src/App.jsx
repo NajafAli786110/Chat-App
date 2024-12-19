@@ -5,7 +5,7 @@ import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { checkAuth, user, isCheckingAuth } = useAuthStore();
+  const { checkAuth, user, isCheckingAuth } = useAuthStore();  
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);

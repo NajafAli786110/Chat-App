@@ -3,11 +3,13 @@ import Navbar from "../components/Navbar";
 import { Homepage, Signup, Login, Setting, Profile } from "../pages";
 import { Navigate, Route, Routes } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
+import useThemeStore from "../store/useThemeStore";
 
 const AppRoutes = () => {
   const { user } = useAuthStore();
+  const { theme } = useThemeStore();
   return (
-    <>
+    <div data-theme={theme}>
       <Navbar />
       <Routes>
         <Route
@@ -22,13 +24,13 @@ const AppRoutes = () => {
           path="/login"
           element={!user ? <Login /> : <Navigate to="/" />}
         />
-        <Route path="/setting" element={<Setting />} />
+        <Route path="/settings" element={<Setting />} />
         <Route
           path="/profile"
           element={user ? <Profile /> : <Navigate to="/login" />}
         />
       </Routes>
-    </>
+    </div>
   );
 };
 
